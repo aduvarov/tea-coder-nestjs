@@ -31,10 +31,13 @@ export class TaskService {
         return task;
     }
 
-    create({ title }: CreateTaskDto) {
+    create({ title, description, priority, tags }: CreateTaskDto) {
         const newTask = {
             id: this.tasks.length + 1,
             title: title,
+            description: description,
+            priority,
+            tags,
             isCompleted: false,
         };
 
