@@ -4,6 +4,7 @@ import { MovieEntity } from './entities/movie.entity';
 import { In, Repository } from 'typeorm';
 import { MovieDto } from './dto/movie.dto';
 import { ActorEntity } from 'src/actor/entities/actor.entity';
+import { MoviePosterEntity } from './entities/poster.entity';
 
 @Injectable()
 export class MovieService {
@@ -12,6 +13,8 @@ export class MovieService {
         private readonly movieRepository: Repository<MovieEntity>,
         @InjectRepository(ActorEntity)
         private readonly actorRepository: Repository<ActorEntity>,
+        @InjectRepository(MoviePosterEntity)
+        private readonly posterRepository: Repository<MoviePosterEntity>,
     ) {}
 
     async findById(id: string): Promise<MovieEntity> {
@@ -38,7 +41,7 @@ export class MovieService {
     }
 
     async create(dto: MovieDto): Promise<MovieEntity> {
-        const { title, releaseYear, actorIds } = dto;
+        const { title, releaseYear, actorIds, imageUrl } = dto;
 
         const actors = await this.actorRepository.find({
             where: {
@@ -51,9 +54,17 @@ export class MovieService {
                 'Один или несколько актёров не найдено',
             );
 
+        let poster: MoviePosterEntity | null = null;
+
+        if (imageUrl) {
+            poster = this.posterRepository.create({ url: imageUrl });
+            await this.posterRepository.save(poster);
+        }
+
         const movie = this.movieRepository.create({
             title,
             releaseYear,
+            poster,
             actors,
         });
         return await this.movieRepository.save(movie);

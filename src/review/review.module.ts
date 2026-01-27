@@ -6,10 +6,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MovieService } from 'src/movie/movie.service';
 import { MovieEntity } from 'src/movie/entities/movie.entity';
 import { ActorEntity } from 'src/actor/entities/actor.entity';
+import { MoviePosterEntity } from 'src/movie/entities/poster.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([ReviewEntity, MovieEntity, ActorEntity]),
+        TypeOrmModule.forFeature([
+            ReviewEntity,
+            MovieEntity,
+            MoviePosterEntity,
+            ActorEntity,
+        ]),
     ],
 
     controllers: [ReviewController],
