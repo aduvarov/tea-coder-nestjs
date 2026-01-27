@@ -3,13 +3,9 @@ import {
     Controller,
     Delete,
     Get,
-    Headers,
     Param,
     Post,
     Put,
-    Query,
-    Req,
-    Res,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { MovieService } from './movie.service';
@@ -27,7 +23,7 @@ export class MovieController {
 
     @Get(':id')
     findById(@Param('id') id: string) {
-        return this.movieService.findById(+id);
+        return this.movieService.findById(id);
     }
 
     @Post()
@@ -37,11 +33,11 @@ export class MovieController {
 
     @Put(':id')
     update(@Param('id') id: string, @Body() body: MovieDto) {
-        return this.movieService.update(+id, body);
+        return this.movieService.update(id, body);
     }
 
     @Delete(':id')
     delete(@Param('id') id: string) {
-        return this.movieService.delete(+id);
+        return this.movieService.delete(id);
     }
 }
