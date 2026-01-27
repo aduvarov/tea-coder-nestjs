@@ -1,4 +1,4 @@
-import { ReviewEntity } from 'src/review/entity/review.entity';
+import { ReviewEntity } from 'src/review/entities/review.entity';
 import {
     Column,
     CreateDateColumn,
