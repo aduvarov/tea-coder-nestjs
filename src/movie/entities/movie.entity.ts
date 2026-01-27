@@ -1,9 +1,11 @@
+import { ReviewEntity } from 'src/review/entity/review.entity';
 import {
     Column,
     CreateDateColumn,
     Entity,
     Generated,
-    PrimaryColumn,
+    OneToMany,
+    PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
@@ -16,7 +18,7 @@ export enum Genre {
 
 @Entity({ name: 'movies' })
 export class MovieEntity {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn('uuid')
     @Generated('uuid')
     id: string;
 
@@ -59,6 +61,9 @@ export class MovieEntity {
         name: 'created_at',
     })
     createdAt: Date;
+
+    @OneToMany(() => ReviewEntity, (review) => review.movie)
+    reviews: ReviewEntity[];
 
     @UpdateDateColumn({
         name: 'updated_at',

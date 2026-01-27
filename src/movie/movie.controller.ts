@@ -7,10 +7,8 @@ import {
     Post,
     Put,
 } from '@nestjs/common';
-import type { Request, Response } from 'express';
 import { MovieService } from './movie.service';
 import { MovieDto } from './dto/movie.dto';
-import { IsNumberString } from 'class-validator';
 
 @Controller('movies')
 export class MovieController {
