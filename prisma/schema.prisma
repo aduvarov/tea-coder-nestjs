@@ -17,8 +17,8 @@ model Movie {
     isAvailable Boolean @default(false) @map("is_available")
     genre       Genre   @default(DRAMA)
 
-    poster   MoviePoster @relation(fields: [posterId], references: [id])
-    posterId String      @unique @map("poster_id")
+    poster   MoviePoster? @relation(fields: [posterId], references: [id])
+    posterId String?      @unique @map("poster_id")
 
     reviews Review[] @relation("movie_reviews")
     actors  Actor[]  @relation("movie_actors")
