@@ -7,9 +7,6 @@ import { ActorEntity } from 'src/actor/entities/actor.entity';
 import { MoviePosterEntity } from './entities/poster.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([MovieEntity, MoviePosterEntity, ActorEntity]),
-    ],
     controllers: [MovieController],
     providers: [MovieService],
 })

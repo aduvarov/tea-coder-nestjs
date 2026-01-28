@@ -9,15 +9,6 @@ import { ActorEntity } from 'src/actor/entities/actor.entity';
 import { MoviePosterEntity } from 'src/movie/entities/poster.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            ReviewEntity,
-            MovieEntity,
-            MoviePosterEntity,
-            ActorEntity,
-        ]),
-    ],
-
     controllers: [ReviewController],
     providers: [ReviewService, MovieService],
 })

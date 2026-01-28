@@ -4,10 +4,9 @@ import { CreateReviewDto } from './dto/create-review.dto';
 
 @Controller('reviews')
 export class ReviewController {
-    constructor(private readonly reviewService: ReviewService) {}
-
-    @Post()
-    create(@Body() body: CreateReviewDto) {
-        return this.reviewService.create(body);
-    }
+    // constructor(private readonly reviewService: ReviewService) {}
+    // @Post()
+    // create(@Body() body: CreateReviewDto) {
+    //     return this.reviewService.create(body);
+    // }
 }
