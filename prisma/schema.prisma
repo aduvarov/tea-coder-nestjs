@@ -1,13 +1,49 @@
 generator client {
-  provider = "prisma-client-js"
-//   output   = "../generated/prisma"
+    provider = "prisma-client-js"
+    //   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider  = "postgresql"
+    provider = "postgresql"
 }
 
-model User {
+model Movie {
     id String @id @default(uuid())
-    name String
+
+    title       String
+    description String?
+    releaseYear Int     @map("release_year")
+    rating      Float   @default(0.0)
+    isAvailable Boolean @default(false) @map("is_available")
+    genre       Genre   @default(DRAMA)
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    reviews   Review[] @relation("movie_reviews")
+
+    @@map("movies")
+}
+
+model Review {
+    id String @id @default(uuid())
+
+    text   String
+    rating Decimal @default(0.0)
+
+    movie   Movie  @relation("movie_reviews", fields: [movieId], references: [id], onDelete: Cascade)
+    movieId String @map("movie_id")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("reviews")
+}
+
+enum Genre {
+    ACTION
+    COMEDY
+    DRAMA
+    HORROR
+
+    @@map("enum_genres")
 }
