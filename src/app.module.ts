@@ -1,4 +1,8 @@
-import { Module } from '@nestjs/common';
+import {
+    type MiddlewareConsumer,
+    Module,
+    type NestModule,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MovieModule } from './movie/movie.module';
