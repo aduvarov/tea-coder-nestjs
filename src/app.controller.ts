@@ -4,6 +4,7 @@ import {
     Get,
     Post,
     UseGuards,
+    UseInterceptors,
     UsePipes,
 } from '@nestjs/common';
 import { AppService } from './app.service';
