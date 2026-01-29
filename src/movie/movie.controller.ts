@@ -1,40 +1,89 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
 import { MovieService } from './movie.service';
-import { MovieDto } from './dto/movie.dto';
+import {
+    ApiBody,
+    ApiHeader,
+    ApiNotFoundResponse,
+    ApiOperation,
+    ApiParam,
+    ApiQuery,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
+import { CreateMovieRequest } from './dto/create-movie.dto';
+import { MovieResponse } from './dto/movie.dto';
 
+@ApiTags('Movie')
 @Controller('movies')
 export class MovieController {
     constructor(private readonly movieService: MovieService) {}
-    @Post()
-    create(@Body() dto: MovieDto) {
-        return this.movieService.create(dto);
-    }
 
+    @ApiOperation({
+        summary: 'Получить список фильмов',
+        description: 'Возвращает список со всеми активными фильмами',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Фильмы найдены',
+        type: [MovieResponse],
+    })
     @Get()
     findAll() {
-        return this.movieService.findAll();
+        return [
+            {
+                id: 1,
+                title: 'Fight Club',
+            },
+            {
+                id: 2,
+                title: 'Pulp Fiction',
+            },
+        ];
     }
 
+    @ApiOperation({
+        summary: 'Получить фильм по id',
+        description: 'Возвращает информацию о фильмы',
+    })
+    @ApiParam({ name: 'id', type: 'string', description: 'Id фильма' })
+    @ApiQuery({ name: 'year', type: 'number', description: 'Фильтр по году' })
+    @ApiHeader({ name: 'X-Auth-Token', description: 'Token авторизации' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Фильм найден',
+        type: MovieResponse,
+    })
+    @ApiNotFoundResponse({
+        description: 'Фильм не найден',
+        example: {
+            status: 404,
+            message: 'Movie Not Found',
+            timestamp: '2026-01-29',
+            path: '/movie/123',
+        },
+    })
     @Get(':id')
-    findById(@Param('id') id: string) {
-        return this.movieService.findById(id);
+    findById() {
+        return {
+            id: 1,
+            title: 'Fight Club',
+        };
     }
 
-    @Put(':id')
-    update(@Param('id') id: string, @Body() body: MovieDto) {
-        return this.movieService.update(id, body);
-    }
-
-    @Delete(':id')
-    delete(@Param('id') id: string) {
-        return this.movieService.delete(id);
+    @ApiOperation({ summary: 'Создать фильм' })
+    // @ApiBody({
+    //     schema: {
+    //         type: 'object',
+    //         properties: {
+    //             title: {
+    //                 type: 'string',
+    //                 example: 'Fight Club',
+    //             },
+    //         },
+    //     },
+    // })
+    @Post()
+    create(@Body() dto: CreateMovieRequest) {
+        return dto;
     }
 }
