@@ -1,20 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { logger } from './common/middlewares/logger.middleware';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { MovieModule } from './movie/movie.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-
-    app.useGlobalPipes(new ValidationPipe());
-
-    app.useGlobalInterceptors(new ResponseInterceptor());
-
-    app.useGlobalFilters(new AllExceptionsFilter());
 
     const config = new DocumentBuilder()
         .setTitle('Nest Cource API')
@@ -28,17 +17,13 @@ async function bootstrap() {
         .addBearerAuth()
         .build();
 
-    const document = SwaggerModule.createDocument(app, config, {
-        include: [MovieModule],
-    });
+    const document = SwaggerModule.createDocument(app, config);
 
     SwaggerModule.setup('/docs', app, document, {
         jsonDocumentUrl: '/swagger.json',
         yamlDocumentUrl: '/yaml.json',
         customSiteTitle: 'Nest js Api docs',
     });
-
-    app.use(logger);
 
     await app.listen(3000);
 }
