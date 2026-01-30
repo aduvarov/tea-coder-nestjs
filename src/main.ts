@@ -2,19 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+    app.use(cookieParser());
+    app.useGlobalPipes(new ValidationPipe());
 
     const config = new DocumentBuilder()
         .setTitle('Nest Cource API')
         .setDescription('API documentation for Nest Course')
         .setVersion('1.0.0')
-        .setContact(
-            'TeaCoder Team',
-            'https://teacoder.ru',
-            'support@teacoder.ru',
-        )
+        .setContact('TeaCoder Team', 'https://teacoder.ru', 'support@teacoder.ru')
         .addBearerAuth()
         .build();
 
@@ -25,8 +25,6 @@ async function bootstrap() {
         yamlDocumentUrl: '/yaml.json',
         customSiteTitle: 'Nest js Api docs',
     });
-
-    app.useGlobalPipes(new ValidationPipe());
 
     await app.listen(3000);
 }

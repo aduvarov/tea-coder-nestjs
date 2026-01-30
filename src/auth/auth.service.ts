@@ -4,27 +4,30 @@ import { RegisterRequest } from './dto/register.dto';
 import { hash, verify } from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './interfaces/jwt.interface';
+import type { JwtPayload } from './interfaces/jwt.interface';
 import type { StringValue } from 'ms';
 import { LoginRequest } from './dto/login.dto';
+import type { Response } from 'express';
+import { isDev } from 'src/utils/is-dev.util';
 
 @Injectable()
 export class AuthService {
-    private readonly JWT_SECRET: string;
     private readonly JWT_ACCESS_TOKEN_TTL: string;
     private readonly JWT_REFRESH_TOKEN_TTL: string;
+
+    private readonly COOKIE_DOMAIN: string;
 
     constructor(
         private readonly prismaService: PrismaService,
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
     ) {
-        this.JWT_SECRET = configService.getOrThrow<string>('JWT_SECRET');
         this.JWT_ACCESS_TOKEN_TTL = configService.getOrThrow<string>('JWT_ACCESS_TOKEN_TTL');
         this.JWT_REFRESH_TOKEN_TTL = configService.getOrThrow<string>('JWT_REFRESH_TOKEN_TTL');
+        this.COOKIE_DOMAIN = configService.getOrThrow<string>('COOKIE_DOMAIN');
     }
 
-    async register(dto: RegisterRequest) {
+    async register(res: Response, dto: RegisterRequest) {
         const { name, email, password } = dto;
 
         const existUser = await this.prismaService.user.findUnique({
@@ -45,10 +48,10 @@ export class AuthService {
             },
         });
 
-        return this.generateTokens(user.id);
+        return this.auth(res, user.id);
     }
 
-    async login(dto: LoginRequest) {
+    async login(res: Response, dto: LoginRequest) {
         const { email, password } = dto;
 
         const user = await this.prismaService.user.findUnique({
@@ -71,7 +74,14 @@ export class AuthService {
             throw new NotFoundException('Неправильное имя пользователя или пароль');
         }
 
-        return this.generateTokens(user.id);
+        return this.auth(res, user.id);
+    }
+
+    private auth(res: Response, id: string) {
+        const { accessToken, refreshToken } = this.generateTokens(id);
+        this.setCookie(res, refreshToken, new Date(Date.now() + 1000 * 60 * 60 * 24 * 7));
+
+        return { accessToken };
     }
 
     private generateTokens(id: string) {
@@ -86,5 +96,15 @@ export class AuthService {
         });
 
         return { accessToken, refreshToken };
+    }
+
+    private setCookie(res: Response, value: string, expires: Date) {
+        res.cookie('refreshToken', value, {
+            httpOnly: true,
+            domain: this.COOKIE_DOMAIN,
+            expires,
+            secure: !isDev(this.configService),
+            sameSite: isDev(this.configService) ? 'none' : 'lax',
+        });
     }
 }
