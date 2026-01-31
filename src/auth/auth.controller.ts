@@ -1,4 +1,14 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Post,
+    Req,
+    Res,
+    UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterRequest } from './dto/register.dto';
 import { LoginRequest } from './dto/login.dto';
@@ -12,6 +22,9 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthResponse } from './dto/auth.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Authorization } from './decorators/authorization.decorator';
+import { Authorized } from './decorators/authorised.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -55,12 +68,17 @@ export class AuthController {
         return await this.authService.refresh(req, res);
     }
 
-    @ApiOperation({
-        summary: 'Выход из системы',
-    })
+    @ApiOperation({ summary: 'Выход из системы' })
     @HttpCode(HttpStatus.OK)
     @Post('logout')
     async logout(@Res({ passthrough: true }) res: Response) {
         return await this.authService.logout(res);
+    }
+
+    @Authorization()
+    @Get('@me')
+    @HttpCode(HttpStatus.OK)
+    async me(@Authorized('email') email: string) {
+        return { email };
     }
 }
