@@ -3,29 +3,61 @@ import { AuthService } from './auth.service';
 import { RegisterRequest } from './dto/register.dto';
 import { LoginRequest } from './dto/login.dto';
 import type { Request, Response } from 'express';
+import {
+    ApiBadRequestResponse,
+    ApiConflictResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { AuthResponse } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @HttpCode(HttpStatus.CREATED)
+    @ApiOperation({
+        summary: 'Создание аккаунта',
+        description: 'Создаёт новый аккаунт для пользователя',
+    })
+    @ApiOkResponse({ type: AuthResponse })
+    @ApiBadRequestResponse({ description: 'Некоректные входные данные' })
+    @ApiConflictResponse({ description: 'Пользователь с такой почтой уже существует' })
     @Post('register')
+    @HttpCode(HttpStatus.CREATED)
     async register(@Res({ passthrough: true }) res: Response, @Body() dto: RegisterRequest) {
         return await this.authService.register(res, dto);
     }
 
-    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Вход в систему',
+        description: 'Авторизует пользователя и выдаёт токен доступа',
+    })
+    @ApiOkResponse({ type: AuthResponse })
+    @ApiBadRequestResponse({ description: 'Некоректные входные данные' })
+    @ApiNotFoundResponse({ description: 'Пользователь не найден' })
     @Post('login')
+    @HttpCode(HttpStatus.OK)
     async login(@Res({ passthrough: true }) res: Response, @Body() dto: LoginRequest) {
         return await this.authService.login(res, dto);
     }
 
-    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Обновление токена',
+        description: 'Генерирует новый токен доступа.',
+    })
+    @ApiOkResponse({ type: AuthResponse })
+    @ApiUnauthorizedResponse({ description: 'Недействительный refresh token' })
     @Post('refresh')
+    @HttpCode(HttpStatus.OK)
     async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
         return await this.authService.refresh(req, res);
     }
 
+    @ApiOperation({
+        summary: 'Выход из системы',
+    })
     @HttpCode(HttpStatus.OK)
     @Post('logout')
     async logout(@Res({ passthrough: true }) res: Response) {
