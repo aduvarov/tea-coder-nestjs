@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
         }),
         GraphQLModule.forRootAsync<ApolloDriverConfig>({
             driver: ApolloDriver,
+
             useFactory: getGraphQLConfig,
         }),
         PrismaModule,
